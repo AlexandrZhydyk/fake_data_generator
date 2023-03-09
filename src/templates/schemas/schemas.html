@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-10">
+        <div class="row">
+            <div class="col">
+                <h3>Data schemas</h3>
+            </div>
+            <div class="col">
+                <a class='btn btn-success float-end' href="{%url 'build_schema' %}">New schema</a>
+            </div>
+
+        </div>
+        </br>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+                <th scope="col">Column separator</th>
+                <th scope="col">Modified</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {%for schema in schemas%}
+            <tr>
+                <th scope="row" class="align-middle">
+                    {{ forloop.counter }}
+                </th>
+                <td class="align-middle"><a href="{%url 'get_data_sets' schema.id%}">{{schema.name}}</a></td>
+                <td class="align-middle">{{schema.column_separator}}</td>
+                <td class="align-middle">{{schema.updated_at | date:"Y-m-d"}}</td>
+                <td class="align-middle">
+                    <div class="row">
+                        <div class="col text-center mt-2">
+                            <a class='btn btn-warning' href="#" >Edit schema</a>
+                        </div>
+                        <div class="col">
+                            <form method="POST" action="{% url 'delete_schemas' schema.pk %}">
+                                {% csrf_token %}<input class='btn btn-danger mt-2' type="submit" value="Delete">
+                            </form>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

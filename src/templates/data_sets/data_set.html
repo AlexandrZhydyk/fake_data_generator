@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row d-flex align-items-center">
+    <div class="col-3">
+        <h3>Sample schema</h3>
+    </div>
+    <div class="col-2">
+        <a href="#">Edit schema</a>
+    </div>
+</div>
+
+<div class="row mt-4">
+
+    <div class="col-6">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Column name</th>
+                <th scope="col">Column type</th>
+            </tr>
+            </thead>
+            <tbody>
+            {%for data_type in data_types%}
+            <tr>
+                <th scope="row" class="align-middle">
+                    {{ forloop.counter }}
+                </th>
+                <td class="align-middle">{{data_type.column_name}}</td>
+                <td class="align-middle">{{data_type.get_data_type_display }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+</br>
+<div class="row">
+    <div class="col-10">
+        <div class="row">
+            <div class="col">
+                <h3>Data sets</h3>
+            </div>
+            <div class="col">
+                <div class="row  align-items-center">
+                    <div class="col text-end">
+                        <label for="row_qty">Rows:</label>
+                    </div>
+                    <div class="col">
+                        <input required="true" value="0" type="number" min="1" id="row_qty" class="form-control"
+                               name="row_qty">
+                    </div>
+                    <div class="col">
+                        <button type="button" class='btn btn-success float-end' id="id-gen-data" disabled="true">Generate data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </br>
+        <table class="table table-bordered" id="id_dataset_table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Schema name</th>
+                <th scope="col">Created</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {%for data_set in data_sets%}
+            <tr>
+                <th scope="row" class="align-middle">
+                    {{ forloop.counter }}
+                </th>
+                <td class="align-middle">{{data_set.schema.name}}</td>
+                <td class="align-middle">{{data_set.created_at | date:"Y-m-d"}}</td>
+                <td class="align-middle"><h5 class="pt-2"><span class="badge bg-success">Ready</span></h5></td>
+                <td class="align-middle"><a href="{{data_set.csv_data.url}}">Download</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block jquery %}
+$("#row_qty").on('change', function (event) {
+console.log(this.value);
+    if (this.value > 0) {
+    $("#id-gen-data").attr("disabled", false);
+    } else {
+    $("#id-gen-data").attr("disabled", true);
+}
+});
+
+
+$("#id-gen-data").on('click', function (event) {
+    event.preventDefault();
+
+    const table_rows = $('#id_dataset_table').children('tbody').children('tr').length;
+    const tbody = $('#id_dataset_table').children('tbody');
+    const today_date = new Date().toISOString().slice(0, 10);
+
+
+    if (table_rows) {
+
+        let row = '<tr>'+
+            `<th scope="row" class="align-middle">${table_rows + 1}</th>`+
+            '<td class="align-middle">{{schema.name}}</td>'+
+            `<td class="align-middle">${today_date}</td>`+
+            '<td class="align-middle"><h5 class="pt-2"><span class="badge bg-secondary">Processing</span></h5></td>'+
+            '<td class="align-middle"></td>'+
+            '</tr>';
+
+        tbody.append(row);
+
+    } else {
+    let row = '<tr>'+
+        '<th scope="row" class="align-middle">1</th>'+
+        '<td class="align-middle">{{schema.name}}</td>'+
+        `<td class="align-middle">${today_date}</td>`+
+        '<td class="align-middle"><h5 class="pt-2"><span class="badge bg-secondary">Processing</span></h5></td>'+
+        '<td class="align-middle"></td>'+ '</tr>';
+
+    tbody.append(row);
+    };
+
+    $.ajax({
+    url: "{% url 'data_generate' %}",
+    type: "get",
+    dataType: "json",
+    data: {
+        rows:$('#row_qty').val(),
+        schema_id: {{schema.pk}},
+    },
+
+    headers: {
+        "X-Requested-With": "XMLHttpRequest",
+         "content_type": "application/json"
+    },
+
+    success: (data) => {
+        const table_rows = $('#id_dataset_table').children('tbody').children('tr').length;
+        console.log(table_rows)
+        let td =
+        `<th scope="row" class="align-middle">${table_rows}</th>`+
+        '<td class="align-middle">{{schema.name}}</td>'+
+        `<td class="align-middle">${data.created_at.slice(0, 10)}</td>`+
+        '<td class="align-middle"><h5 class="pt-2"><span class="badge bg-success">Ready</span></h5></td>'+
+        `<td class="align-middle"><a href=${data.csv_data}>Download</a></td>`
+
+        $('#id_dataset_table').find("tr").last().html(td);
+
+    },
+    error : function(xhr,errmsg,err) {
+        console.log(xhr.status + ": " + xhr.responseText);
+    }
+    });
+});
+
+{% endblock %}

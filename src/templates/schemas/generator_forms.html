@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+<form id="meta_data_inputs" method="POST">
+    <div class="row">
+        <div class="col-md-8 mt-2">
+            {{form_schema.as_p}}
+        </div>
+        <div class="col-md-4 mt-2">
+            <button class="btn btn-primary mt-2" type="submit" hx-post="." id="submit_form">
+                Submit
+            </button>
+        </div>
+    </div>
+    </br>
+<div class="row">
+    <div class="col-md-3">
+        Column name
+    </div>
+    <div class="col-md-3">
+        Data type
+    </div>
+    <div class="col-md-3">
+        Order
+    </div>
+</div>
+
+
+
+    <div id="data-formset-body">
+        <div class="row">
+            <div class="col-md-3 mt-2">
+                {{ form.column_name }}
+            </div>
+            <div class="col-md-3 mt-2">
+                {{ form.data_type }}
+            </div>
+            <div class="col-md-3 mt-2">
+                {{ form.order }}
+            </div>
+            <div class="col-md-3 mt-2">
+                <button class="btn btn-danger" type="button" id="form-DELETE">Delete</button>
+            </div>
+        </div>
+    </div>
+</form>
+<button class="btn btn-success" type="button" hx-get="{% url 'create_form_for_data_type' %}"
+        hx-target="#meta_data_inputs" hx-swap="beforeend">
+    Add form
+</button>
+
+{% endblock %}
