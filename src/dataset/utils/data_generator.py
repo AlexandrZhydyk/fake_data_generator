@@ -5,7 +5,6 @@ from faker import Faker
 
 
 class FakeDataGenerator:
-
     def __init__(self):
         self.faker = Faker()
 
@@ -26,6 +25,7 @@ class FakeDataGenerator:
 
     def get_address(self):
         return self.faker.address()
+
     # street_address()
 
     def get_phone_number(self):
@@ -36,7 +36,6 @@ class FakeDataGenerator:
 
     def get_age(self, range_from, range_to):
         return randint(range_from, range_to)
-
 
 
 # key_func_dict = {

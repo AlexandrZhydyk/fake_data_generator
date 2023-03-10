@@ -7,7 +7,7 @@ from accounts.forms import LoginForm
 
 class LoginUser(LoginView):
     form_class = LoginForm
-    template_name = 'accounts/login.html'
+    template_name = "accounts/login.html"
 
 
 class LogoutUser(LoginRequiredMixin, LogoutView):
@@ -15,10 +15,10 @@ class LogoutUser(LoginRequiredMixin, LogoutView):
 
 
 class PageNotFoundView(TemplateView):
-    template_name = 'accounts/404.html'
-    extra_context = {'title': 'Page not found'}
+    template_name = "accounts/404.html"
+    extra_context = {"title": "Page not found"}
 
 
 class UnauthorizedView(TemplateView):
-    template_name = 'accounts/forbidden.html'
-    extra_context = {'title': 'Forbidden'}
+    template_name = "accounts/forbidden.html"
+    extra_context = {"title": "Forbidden"}

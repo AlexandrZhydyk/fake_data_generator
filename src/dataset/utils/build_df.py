@@ -21,8 +21,9 @@ def build_dataframe(data_types, row_qty, faker):
                 for _ in range(row_qty):
                     values_lst.append(
                         faker.get_birthday_date(
-                            data_type.range_from,
-                            data_type.range_to))
+                            data_type.range_from, data_type.range_to
+                        )
+                    )
             case "DM":
                 for _ in range(row_qty):
                     values_lst.append(faker.get_full_domain())
@@ -35,22 +36,20 @@ def build_dataframe(data_types, row_qty, faker):
             case "AG":
                 for _ in range(row_qty):
                     values_lst.append(
-                        faker.get_age(data_type.range_from,
-                                      data_type.range_to))
+                        faker.get_age(data_type.range_from, data_type.range_to)
+                    )
             case "TX":
                 for _ in range(row_qty):
                     values_lst.append(
-                        faker.get_text(data_type.range_from,
-                                       data_type.range_to))
+                        faker.get_text(data_type.range_from, data_type.range_to)
+                    )
         df[data_type.column_name] = values_lst
     return df
 
 
 def create_data_set(schema, df):
     uniq_code = datetime.now()
-    file_name = f'{schema.name}_{uniq_code}.csv'
+    file_name = f"{schema.name}_{uniq_code}.csv"
     file = ContentFile(df.to_csv(), name=file_name)
     data_set = DataSet.objects.create(schema=schema, csv_data=file)
     return data_set
-
-
