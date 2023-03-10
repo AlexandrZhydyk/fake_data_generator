@@ -50,6 +50,6 @@ def build_dataframe(data_types, row_qty, faker):
 def create_data_set(schema, df):
     uniq_code = datetime.now()
     file_name = f"{schema.name}_{uniq_code}.csv"
-    file = ContentFile(df.to_csv(), name=file_name)
+    file = ContentFile(df.to_csv(sep=schema.column_separator), name=file_name)
     data_set = DataSet.objects.create(schema=schema, csv_data=file)
     return data_set
