@@ -1,7 +1,5 @@
 from django.urls import path
 
-# from schemas.views import form_set
-
 from schemas.views import form_set, DeleteSchema, GetSchemas
 
 urlpatterns = [

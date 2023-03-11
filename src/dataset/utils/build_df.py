@@ -1,8 +1,7 @@
-from datetime import datetime
-
 import pandas as pd
-from django.core.files.base import ContentFile
 
+from datetime import datetime
+from django.core.files.base import ContentFile
 from dataset.models import DataSet
 
 
@@ -51,5 +50,5 @@ def create_data_set(schema, df):
     uniq_code = datetime.now()
     file_name = f"{schema.name}_{uniq_code}.csv"
     file = ContentFile(df.to_csv(sep=schema.column_separator), name=file_name)
-    data_set = DataSet.objects.create(schema=schema, csv_data=file)
+    data_set = DataSet.objects.create(schema=schema, csv_data=file, is_done=True)
     return data_set
