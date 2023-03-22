@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, ListView
 
-from schemas.forms import DataFormSet, SchemaForm
+from schemas.forms import DataFormSet, SchemaForm, DataTypeFormSet
 from schemas.models import Schema
 
 
@@ -19,16 +19,14 @@ def form_set(request):
             user = get_user_model().objects.get(pk=1)
             schema.user = user
             schema.save()
-            for form in sorted(
-                form_set, key=lambda form: form.cleaned_data.get("order")
-            ):
-                if form.is_valid():
-                    try:
+            for form in form_set.ordered_forms:
+                try:
+                    if form.is_valid():
                         instance = form.save(commit=False)
                         instance.schema = schema
                         instance.save()
-                    except Exception as e:
-                        print(f"Error: {e}")
+                except Exception as e:
+                    print(f"Error: {e}")
 
             return redirect("schemas")
 
@@ -49,6 +47,30 @@ class GetSchemas(LoginRequiredMixin, ListView):
     def get_queryset(self):
         schemas = Schema.objects.filter(user=self.request.user)
         return schemas
+
+
+def update_schema(request, pk):
+    schema = Schema.objects.get(pk=pk)
+    form_schema = SchemaForm(instance=schema)
+    formset = DataTypeFormSet(instance=schema)
+    if request.method == "POST":
+        form_schema = SchemaForm(request.POST)
+        formset = DataTypeFormSet(request.POST, instance=schema)
+        if formset.is_valid() and form_schema.is_valid():
+            form_schema.save()
+            instances = formset.save(commit=False)
+            for obj in formset.deleted_objects:
+                obj.delete()
+            for instance in instances:
+                instance.schema = schema
+                instance.save()
+            return redirect("schemas")
+
+    context = {
+        "schema": form_schema,
+        "formset": formset,
+    }
+    return render(request, "schemas/update_schemas.html", context)
 
 
 class DeleteSchema(LoginRequiredMixin, DeleteView):

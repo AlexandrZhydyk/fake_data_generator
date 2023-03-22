@@ -7,7 +7,7 @@ from dataset.models import DataSet
 
 def build_dataframe(data_types, row_qty, faker):
     df = pd.DataFrame(data={})
-    for data_type in data_types:
+    for data_type in sorted(data_types, key=lambda data_type: data_type.ORDER):
         values_lst = []
         match data_type.data_type:
             case "FN":

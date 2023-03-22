@@ -30,13 +30,13 @@
                 <th scope="row" class="align-middle">
                     {{ forloop.counter }}
                 </th>
-                <td class="align-middle"><a href="{%url 'get_data_sets' schema.id%}">{{schema.name}}</a></td>
+                <td class="align-middle"><a href="{% url 'get_data_sets' schema.pk %}">{{schema.name}}</a></td>
                 <td class="align-middle">{{schema.column_separator}}</td>
                 <td class="align-middle">{{schema.updated_at | date:"Y-m-d"}}</td>
                 <td class="align-middle">
                     <div class="row">
                         <div class="col text-center mt-2">
-                            <a class='btn btn-warning' href="#" >Edit schema</a>
+                            <a class='btn btn-warning' href="{% url 'update_schema' schema.pk %}" >Edit schema</a>
                         </div>
                         <div class="col">
                             <form method="POST" action="{% url 'delete_schemas' schema.pk %}">

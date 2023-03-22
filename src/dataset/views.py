@@ -41,7 +41,9 @@ class GetDataSets(LoginRequiredMixin, View):
         schema_id = kwargs.get("schema_id")
         schema = Schema.objects.get(pk=schema_id)
         data_types = DataType.objects.filter(schema=schema)
-        data_sets = DataSet.objects.filter(schema__user=self.request.user)
+        data_sets = DataSet.objects.filter(
+            schema__user=self.request.user, schema=schema
+        )
         return render(
             request,
             self.template_name,

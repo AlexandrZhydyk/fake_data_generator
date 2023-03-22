@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form class="form-horizontal" method="POST">
+    <h3>Schema</h3>
+    <div class="row">
+        <div class="col-md-7 mt-2">
+            {{schema.as_p}}
+        </div>
+        <div class="col-md-5 mt-2">
+            <button class="btn btn-primary mt-4 float-end" type="submit" id="submit_form_set">
+                Update
+            </button>
+        </div>
+    </div>
+    </br>
+    <h3>Schema columns</h3>
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <div id="data-formset-body">
+
+        {% for form in formset %}
+        <div id="form-{{forloop.counter0}}">
+            {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+            {% endfor %}
+            <div class="row">
+                <div class="col-md-4 mt-2">
+                    {{ form.column_name.label_tag }}
+                    {{ form.column_name }}
+                </div>
+                <div class="col-md-3 mt-2">
+                    {{ form.data_type.label_tag }}
+                    {{ form.data_type }}
+                </div>
+                <div class="col-md-2 mt-2">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.range_from.label_tag }}
+                            {{ form.range_from }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.range_to.label_tag }}
+                            {{ form.range_to }}
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 mt-2">
+                    {{ form.ORDER.label_tag }}
+                    {{ form.ORDER }}
+                </div>
+                <div class="col-md-1 mt-2">
+                    {{ form.DELETE }}
+                    <label class="btn btn-danger mt-4" for="{{ form.DELETE.id_for_label }}">
+                        Delete
+                    </label>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</form>
+
+<div id="empty_form" hidden="true">
+    <div id="form-__prefix__">
+        <div class="row">
+            <div class="col-md-4 mt-2">
+                {{ formset.empty_form.column_name.label_tag }}
+                {{ formset.empty_form.column_name }}
+            </div>
+            <div class="col-md-3 mt-2">
+                {{ formset.empty_form.data_type.label_tag }}
+                {{ formset.empty_form.data_type }}
+            </div>
+            <div class="col-md-2 mt-2">
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ formset.empty_form.range_from.label_tag }}
+                        {{ formset.empty_form.range_from }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ formset.empty_form.range_to.label_tag }}
+                        {{ formset.empty_form.range_to }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 mt-2">
+                {{ formset.empty_form.ORDER.label_tag }}
+                {{ formset.empty_form.ORDER }}
+            </div>
+            <div class="col-md-1 mt-2">
+                {{ formset.empty_form.DELETE }}
+                <label class="btn btn-danger mt-4" for="{{ formset.empty_form.DELETE.auto_id }}">
+                    Delete
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input class="btn btn-success mb-5" type="button" value="Add More" id="add_more">
+</br>
+
+{% endblock content%}
+
+{% block jquery %}
+
+
+$(":checkbox").each(function() {
+    const arr = this.id.split("-");
+    $(`#${this.id}`).change(function(event){
+        $(`#form-${arr[1]}`).attr("hidden", true);
+    });
+});
+
+
+
+$('.form-select').each(function() {
+    const arr = this.id.split("-");
+    if( this.value == "BR" || this.value == "AG" || this.value == "TX") {
+        $(`#id_data_type-${arr[1]}-range_from`).attr("hidden", false);
+        $(`#id_data_type-${arr[1]}-range_to`).attr("hidden", false);
+    } else {
+        $(`#id_data_type-${arr[1]}-range_from`).prev("label").attr("hidden", true);
+        $(`#id_data_type-${arr[1]}-range_to`).prev("label").attr("hidden", true);
+    }
+
+    $(`#${this.id}`).on('change', function(event){
+        if( this.value == "BR" || this.value == "AG" || this.value == "TX"){
+            $(`#id_data_type-${arr[1]}-range_from`).prev("label").attr("hidden", false);
+            $(`#id_data_type-${arr[1]}-range_from`).attr("hidden", false);
+            $(`#id_data_type-${arr[1]}-range_from`).attr("required", true);
+            $(`#id_data_type-${arr[1]}-range_to`).prev("label").attr("hidden", false);
+            $(`#id_data_type-${arr[1]}-range_to`).attr("hidden", false);
+            $(`#id_data_type-${arr[1]}-range_to`).attr("required", true);
+        } else {
+            $(`#id_data_type-${arr[1]}-range_from`).prev("label").attr("hidden", true);
+            $(`#id_data_type-${arr[1]}-range_from`).attr("hidden", true);
+            $(`#id_data_type-${arr[1]}-range_from`).attr("required", false);
+            $(`#id_data_type-${arr[1]}-range_from`).val('');
+            $(`#id_data_type-${arr[1]}-range_to`).prev("label").attr("hidden", true);
+            $(`#id_data_type-${arr[1]}-range_to`).attr("required", false);
+            $(`#id_data_type-${arr[1]}-range_to`).val('');
+            $(`#id_data_type-${arr[1]}-range_to`).attr("hidden", true);
+        };
+    });
+});
+
+let form_idx = $('#id_data_type-TOTAL_FORMS').val();
+
+<!--Bind listener on Add more button-->
+$('#add_more').click(function(event) {
+    event.preventDefault();
+    let empty_form = $('#empty_form').html().replace(/__prefix__/g, form_idx);
+    $('#data-formset-body').append(empty_form);
+    $('#id_data_type-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+
+
+    console.log(form_idx)
+    $(`#id_data_type-${form_idx}-data_type`).on('change', function(event){
+        const arr = this.id.split("-");
+        if( this.value == "BR" || this.value == "AG" || this.value == "TX"){
+            console.log($(`#id_form-${form_idx}-range_from`));
+            $(`#id_data_type-${arr[1]}-range_from`).prev("label").attr("hidden", false);
+            $(`#id_data_type-${arr[1]}-range_from`).attr("hidden", false);
+            $(`#id_data_type-${arr[1]}-range_from`).attr("required", true);
+            $(`#id_data_type-${arr[1]}-range_to`).prev("label").attr("hidden", false);
+            $(`#id_data_type-${arr[1]}-range_to`).attr("hidden", false);
+            $(`#id_data_type-${arr[1]}-range_to`).attr("required", true);
+        } else {
+            $(`#id_data_type-${arr[1]}-range_from`).prev("label").attr("hidden", true);
+            $(`#id_data_type-${arr[1]}-range_from`).attr("hidden", true);
+            $(`#id_data_type-${arr[1]}-range_from`).attr("required", false);
+            $(`#id_data_type-${arr[1]}-range_from`).val('');
+            $(`#id_data_type-${arr[1]}-range_to`).prev("label").attr("hidden", true);
+            $(`#id_data_type-${arr[1]}-range_to`).attr("required", false);
+            $(`#id_data_type-${arr[1]}-range_to`).val('');
+            $(`#id_data_type-${arr[1]}-range_to`).attr("hidden", true);
+        };
+    });
+    form_idx++;
+});
+
+
+{% endblock %}

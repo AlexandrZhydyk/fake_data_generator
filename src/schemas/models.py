@@ -33,10 +33,10 @@ class DataType(models.Model):
     ]
 
     column_name = models.CharField(
-        max_length=60, null=False, blank=False, verbose_name="Column name"
+        max_length=60, null=False, blank=True, verbose_name="Column name"
     )
     data_type = models.CharField(max_length=2, choices=DATA_TYPES, default="FN")
-    order = models.IntegerField(
+    ORDER = models.IntegerField(
         blank=True, validators=[MinValueValidator(limit_value=0)], default=0
     )
     schema = models.ForeignKey(

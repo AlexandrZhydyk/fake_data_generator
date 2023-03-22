@@ -2,7 +2,6 @@
 
 {% block content %}
 
-
 <form class="form-horizontal" method="POST">
     <h3>New schema</h3>
     <div class="row">
@@ -45,18 +44,21 @@
                     </div>
                 </div>
                 <div class="col-md-2 mt-2">
-                    {{ form.order.label_tag }}
-                    {{ form.order }}
+                    {{ form.ORDER.label_tag }}
+                    {{ form.ORDER }}
                 </div>
                 <div class="col-md-1 mt-2">
-                    <button class="btn btn-danger mt-4 float-end" type="button" id="form-0-DELETE">Delete</button>
+                    {{ form.DELETE }}
+                    <label class="btn btn-danger mt-4" for="{{ form.DELETE.id_for_label }}">
+                        Delete
+                    </label>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
-
 </form>
+
 <div id="empty_form" hidden="true">
     <div id="form-__prefix__">
         <div class="row">
@@ -81,11 +83,14 @@
                 </div>
             </div>
             <div class="col-md-2 mt-2">
-                {{ formset.empty_form.order.label_tag }}
-                {{ formset.empty_form.order }}
+                {{ formset.empty_form.ORDER.label_tag }}
+                {{ formset.empty_form.ORDER }}
             </div>
             <div class="col-md-1 mt-2">
-                <button class="btn btn-danger mt-4 float-end" type="button" id="form-__prefix__-DELETE">Delete</button>
+                {{ formset.empty_form.DELETE }}
+                <label class="btn btn-danger mt-4" for="{{ formset.empty_form.DELETE.auto_id }}">
+                    Delete
+                </label>
             </div>
         </div>
     </div>
@@ -95,105 +100,84 @@
 {% endblock %}
 
 {% block jquery %}
-    let form_idx = $('#id_form-TOTAL_FORMS').val();
-    let form_counter = $('#id_form-TOTAL_FORMS').val();
-    <!--Bind listener on Add more button-->
-    $('#add_more').click(function(event) {
-        event.preventDefault();
-        let empty_form = $('#empty_form').html().replace(/__prefix__/g, form_counter)
-        $('#data-formset-body').append(empty_form);
-        $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+let form_idx = $('#id_form-TOTAL_FORMS').val();
 
-        <!--Bind listener on select for range fields-->
+<!--Bind listener on Add more button-->
+$('#add_more').click(function(event) {
+    event.preventDefault();
+    let empty_form = $('#empty_form').html().replace(/__prefix__/g, form_idx)
+    $('#data-formset-body').append(empty_form);
+    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 
-        $(`#id_form-${form_counter}-range_from`).prev("label").attr("hidden", true);
-        $(`#id_form-${form_counter}-range_to`).prev("label").attr("hidden", true);
+    <!--Bind listener on select for range fields-->
 
-        $(`#id_form-${form_counter}-data_type`).on('change', function(event){
-            console.log(this.id);
-            const arr = this.id.split("-");
-            if( this.value == "BR" || this.value == "AG" || this.value == "TX"){
-                console.log($(`#id_form-${form_counter}-range_from`));
-                $(`#id_form-${arr[1]}-range_from`).prev("label").attr("hidden", false);
-                $(`#id_form-${arr[1]}-range_from`).attr("hidden", false);
-                $(`#id_form-${arr[1]}-range_from`).attr("required", true);
-                $(`#id_form-${arr[1]}-range_to`).prev("label").attr("hidden", false);
-                $(`#id_form-${arr[1]}-range_to`).attr("hidden", false);
-                $(`#id_form-${arr[1]}-range_to`).attr("required", true);
-            } else {
-                $(`#id_form-${arr[1]}-range_from`).prev("label").attr("hidden", true);
-                $(`#id_form-${arr[1]}-range_from`).attr("hidden", true);
-                $(`#id_form-${arr[1]}-range_from`).attr("required", false);
-                $(`#id_form-${arr[1]}-range_from`).val('');
-                $(`#id_form-${arr[1]}-range_to`).prev("label").attr("hidden", true);
-                $(`#id_form-${arr[1]}-range_to`).attr("required", false);
-                $(`#id_form-${arr[1]}-range_to`).val('');
-                $(`#id_form-${arr[1]}-range_to`).attr("hidden", true);
-            };
-        });
+    $(`#id_form-${form_idx}-range_from`).prev("label").attr("hidden", true);
+    $(`#id_form-${form_idx}-range_to`).prev("label").attr("hidden", true);
 
-        <!--Bind listener on just created delete button-->
-        $(`#form-${form_counter}-DELETE`).click(function(event){
-            deleted_form_id = this.id.replace('-DELETE', '');
-            $(`#${deleted_form_id}`).remove();
-            $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) - 1);
-            form_idx--
-        });
+    $(`#id_form-${form_idx}-data_type`).on('change', function(event){
+        console.log(this.id);
+        const arr = this.id.split("-");
+        if( this.value == "BR" || this.value == "AG" || this.value == "TX"){
+            console.log($(`#id_form-${form_idx}-range_from`));
+            $(`#id_form-${arr[1]}-range_from`).prev("label").attr("hidden", false);
+            $(`#id_form-${arr[1]}-range_from`).attr("hidden", false);
+            $(`#id_form-${arr[1]}-range_from`).attr("required", true);
+            $(`#id_form-${arr[1]}-range_to`).prev("label").attr("hidden", false);
+            $(`#id_form-${arr[1]}-range_to`).attr("hidden", false);
+            $(`#id_form-${arr[1]}-range_to`).attr("required", true);
+        } else {
+            $(`#id_form-${arr[1]}-range_from`).prev("label").attr("hidden", true);
+            $(`#id_form-${arr[1]}-range_from`).attr("hidden", true);
+            $(`#id_form-${arr[1]}-range_from`).attr("required", false);
+            $(`#id_form-${arr[1]}-range_from`).val('');
+            $(`#id_form-${arr[1]}-range_to`).prev("label").attr("hidden", true);
+            $(`#id_form-${arr[1]}-range_to`).attr("required", false);
+            $(`#id_form-${arr[1]}-range_to`).val('');
+            $(`#id_form-${arr[1]}-range_to`).attr("hidden", true);
+        };
+    });
+
+    <!--Bind listener on delete button-->
+    $(`#id_form-${form_idx}-DELETE`).change(function(event){
+        const arr = this.id.split("-");
+        console.log(form_idx)
+        $(`#form-${arr[1]}`).attr("hidden", true);
+        $(`#id_form-${arr[1]}-column_name`).attr("required", false);
+    });
     form_idx++
-    form_counter++
 });
 
-
-    <!--Event listener to initial delete button-->
-    $('#form-0-DELETE').click(function(event){
-        deleted_form_id = this.id.replace('-DELETE', '');
-        $('#form-0').remove();
-        $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) - 1);
-        form_idx--
-    });
-
-
-<!--Rename all input ids in the forms for sequential numbers-->
-    $('.form-horizontal').one('submit', function(event){
-        event.preventDefault();
-        let counter = 0
-        $('#data-formset-body').children('div').each(function() {
-            $(`#${this.id}`).attr("name",`form-${counter}`);
-            $(`#${this.id}`).find(':input').each(function() {
-                const arr = this.name.split("-");
-                $(`#${this.id}`).attr("name",`${arr[0]}-${counter}-${arr[2]}`);
-            });
-            counter++
-        });
-        event.currentTarget.submit();
-    });
+<!--Bind listener on initial delete field-->
+$('#id_form-0-DELETE').change(function(event){
+    $('#form-0').attr("hidden", true);
+    $(`#id_form-0-column_name`).attr("required", false);
+});
 
 
 <!--Bind listener on initial select for range fields-->
 
-    $(`#id_form-0-range_from`).prev("label").attr("hidden", true);
-    $(`#id_form-0-range_to`).prev("label").attr("hidden", true);
+$(`#id_form-0-range_from`).prev("label").attr("hidden", true);
+$(`#id_form-0-range_to`).prev("label").attr("hidden", true);
 
-    $('#id_form-0-data_type').on('change', function(event){
-        if( this.value == "BR" || this.value == "AG" || this.value == "TX"){
-            $(`#id_form-0-range_from`).prev("label").attr("hidden", false);
-            $('#id_form-0-range_from').attr("hidden", false);
-            $('#id_form-0-range_from').attr("required", true);
-            $(`#id_form-0-range_to`).prev("label").attr("hidden", false);
-            $('#id_form-0-range_to').attr("hidden", false);
-            $('#id_form-0-range_to').attr("required", true);
-        } else {
-            $(`#id_form-0-range_from`).prev("label").attr("hidden", true);
-            $('#id_form-0-range_from').val('');
-            $('#id_form-0-range_from').attr("hidden", true);
-            $('#id_form-0-range_from').attr("required", false);
-            $(`#id_form-0-range_to`).prev("label").attr("hidden", true);
-            $('#id_form-0-range_to').val('');
-            $('#id_form-0-range_to').attr("hidden", true);
-            $('#id_form-0-range_to').attr("required", false);
-
-        };
-    });
+$('#id_form-0-data_type').on('change', function(event){
+    if( this.value == "BR" || this.value == "AG" || this.value == "TX"){
+        $(`#id_form-0-range_from`).prev("label").attr("hidden", false);
+        $('#id_form-0-range_from').attr("hidden", false);
+        $('#id_form-0-range_from').attr("required", true);
+        $(`#id_form-0-range_to`).prev("label").attr("hidden", false);
+        $('#id_form-0-range_to').attr("hidden", false);
+        $('#id_form-0-range_to').attr("required", true);
+    } else {
+        $(`#id_form-0-range_from`).prev("label").attr("hidden", true);
+        $('#id_form-0-range_from').val('');
+        $('#id_form-0-range_from').attr("hidden", true);
+        $('#id_form-0-range_from').attr("required", false);
+        $(`#id_form-0-range_to`).prev("label").attr("hidden", true);
+        $('#id_form-0-range_to').val('');
+        $('#id_form-0-range_to').attr("hidden", true);
+        $('#id_form-0-range_to').attr("required", false);
+    };
+});
 
 {% endblock %}
 
