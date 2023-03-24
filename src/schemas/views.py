@@ -8,7 +8,7 @@ from schemas.forms import DataFormSet, SchemaForm, DataTypeFormSet
 from schemas.models import Schema
 
 
-def form_set(request):
+def create_schema(request):
     form_schema = SchemaForm()
     form_set = DataFormSet()
     if request.method == "POST":
@@ -16,7 +16,7 @@ def form_set(request):
         form_schema = SchemaForm(request.POST)
         if form_schema.is_valid() and form_set.is_valid():
             schema = form_schema.save(commit=False)
-            user = get_user_model().objects.get(pk=1)
+            user = get_user_model().objects.get(pk=request.user.pk)
             schema.user = user
             schema.save()
             for form in form_set.ordered_forms:
